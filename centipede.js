@@ -1,5 +1,54 @@
 'use strict';
 
+var SHOT_RELOAD_TIME = 0.2;
+
+class Entity {}
+
+class Player extends Entity {
+	constructor() {
+		super();
+		this.sprite = game.spritesheet.createSprite('player');
+		this.playerMovement = [0, 0];
+		this.shotTimer = SHOT_RELOAD_TIME;
+	}
+	update() {
+		this.updateMovement();
+		this.updateFire();
+	}
+	updateMovement() {
+		vec2.set(this.playerMovement, 0, 0);
+		if (game.input.isKeyDown(Yaje.Keys.ARROW_UP)) {
+			this.playerMovement[1] -= 1;
+		}
+		if (game.input.isKeyDown(Yaje.Keys.ARROW_DOWN)) {
+			this.playerMovement[1] += 1;
+		}
+		if (game.input.isKeyDown(Yaje.Keys.ARROW_LEFT)) {
+			this.playerMovement[0] -= 1;
+		}
+		if (game.input.isKeyDown(Yaje.Keys.ARROW_RIGHT)) {
+			this.playerMovement[0] += 1;
+		}
+		vec2.normalize(this.playerMovement, this.playerMovement);
+		this.playerMovement[0] *= 300 * game.clock.deltaTime;
+		this.playerMovement[1] *= 300 * game.clock.deltaTime;
+		
+		this.sprite.move(this.playerMovement[0], this.playerMovement[1]);
+	}
+	updateFire() {
+		if (this.shotTimer > 0) this.shotTimer -= game.clock.deltaTime;
+		if (game.input.isKeyDown(32)) {
+			if (this.shotTimer <= 0) {
+				this.shotTimer = SHOT_RELOAD_TIME;
+				game.soundPlayer.play('shot');
+			}
+		}
+	}
+	draw() {
+		game.graphics.draw(this.sprite);
+	}
+}
+
 class Game {
 	constructor() {
 		let canvas = document.getElementById('game-canvas');
@@ -27,36 +76,18 @@ class Game {
 		this.musicPlayer = new Yaje.MusicPlayer();
 		this.musicPlayer.register('default', 'assets/music.ogg');
 		
-		this.playerMovement = [0, 0];
-		
-		this.start();
+		this.soundPlayer = new Yaje.SoundPlayer();
+		this.soundPlayer.register('shot', 'assets/shot.wav', 3);
 	}
 	start() {
 		this.musicPlayer.play('default');
-		this.player = this.spritesheet.createSprite('player');
+		this.player = new Player();
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
 		this.clock.update();
 		
-		vec2.set(this.playerMovement, 0, 0);
-		if (this.input.isKeyDown(Yaje.Keys.ARROW_UP)) {
-			this.playerMovement[1] -= 1;
-		}
-		if (this.input.isKeyDown(Yaje.Keys.ARROW_DOWN)) {
-			this.playerMovement[1] += 1;
-		}
-		if (this.input.isKeyDown(Yaje.Keys.ARROW_LEFT)) {
-			this.playerMovement[0] -= 1;
-		}
-		if (this.input.isKeyDown(Yaje.Keys.ARROW_RIGHT)) {
-			this.playerMovement[0] += 1;
-		}
-		vec2.normalize(this.playerMovement, this.playerMovement);
-		this.playerMovement[0] *= 300 * this.clock.deltaTime;
-		this.playerMovement[1] *= 300 * this.clock.deltaTime;
-		
-		this.player.move(this.playerMovement[0], this.playerMovement[1]);
+		this.player.update();
 		
 		this.draw();
 	}
@@ -64,7 +95,7 @@ class Game {
 	draw() {
 		this.graphics.clear();
 		
-		this.graphics.draw(this.player);
+		this.player.draw();
 		
 		this.graphics.display();
 	}
@@ -72,5 +103,6 @@ class Game {
 
 (function () {
 	window.game = new Game();
+	window.game.start();
 	window.game.update();
 })();
