@@ -1,8 +1,11 @@
 'use strict';
 
-var SHOT_RELOAD_TIME = 0.2;
-var PLAYER_SPEED = 300.0;
-var MISSILE_SPEED = 800.0;
+const SHOT_RELOAD_TIME = 0.2;
+const PLAYER_SPEED = 300.0;
+const MISSILE_SPEED = 800.0;
+
+const GAME_WIDTH = 800;
+const GAME_HEIGHT = 600;
 
 class Entity {
 	constructor() {
@@ -29,6 +32,8 @@ class Player extends Entity {
 		this.sprite = game.spritesheet.createSprite('player');
 		this.playerMovement = [0, 0];
 		this.shotTimer = SHOT_RELOAD_TIME;
+		
+		this.sprite.setPosition(GAME_WIDTH / 2 - 16, GAME_HEIGHT - 32);
 	}
 	update() {
 		this.updateMovement();
@@ -53,6 +58,11 @@ class Player extends Entity {
 		this.playerMovement[1] *= PLAYER_SPEED * game.clock.deltaTime;
 		
 		this.sprite.move(this.playerMovement[0], this.playerMovement[1]);
+
+		if (this.x < 0) this.sprite.setPosition(1, this.y);
+		if (this.x > GAME_WIDTH - 32) this.sprite.setPosition(GAME_WIDTH - 32, this.y);
+		if (this.y < GAME_HEIGHT / 3 * 2) this.sprite.setPosition(this.x, GAME_HEIGHT / 3 * 2);
+		if (this.y > GAME_HEIGHT - 32) this.sprite.setPosition(this.x, GAME_HEIGHT - 32);
 	}
 	updateFire() {
 		if (this.shotTimer > 0) this.shotTimer -= game.clock.deltaTime;
