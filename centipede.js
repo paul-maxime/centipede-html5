@@ -1,8 +1,17 @@
 'use strict';
 
 var SHOT_RELOAD_TIME = 0.2;
+var PLAYER_SPEED = 300.0;
+var MISSILE_SPEED = 800.0;
 
-class Entity {}
+class Entity {
+	constructor() {
+		this.markedForRemoval = false;
+	}
+	remove() {
+		this.markedForRemoval = true;
+	}
+}
 
 class Player extends Entity {
 	constructor() {
@@ -30,8 +39,8 @@ class Player extends Entity {
 			this.playerMovement[0] += 1;
 		}
 		vec2.normalize(this.playerMovement, this.playerMovement);
-		this.playerMovement[0] *= 300 * game.clock.deltaTime;
-		this.playerMovement[1] *= 300 * game.clock.deltaTime;
+		this.playerMovement[0] *= PLAYER_SPEED * game.clock.deltaTime;
+		this.playerMovement[1] *= PLAYER_SPEED * game.clock.deltaTime;
 		
 		this.sprite.move(this.playerMovement[0], this.playerMovement[1]);
 	}
@@ -41,7 +50,25 @@ class Player extends Entity {
 			if (this.shotTimer <= 0) {
 				this.shotTimer = SHOT_RELOAD_TIME;
 				game.soundPlayer.play('shot');
+				game.addEntity(new Missile());
 			}
+		}
+	}
+	draw() {
+		game.graphics.draw(this.sprite);
+	}
+}
+
+class Missile extends Entity {
+	constructor() {
+		super();
+		this.sprite = game.spritesheet.createSprite('missile');
+		this.sprite.setPosition(game.player.sprite.position[0] + 14, game.player.sprite.position[1]);
+	}
+	update() {
+		this.sprite.move(0, -MISSILE_SPEED * game.clock.deltaTime);
+		if (this.sprite.position[1] < -100) {
+			this.remove();
 		}
 	}
 	draw() {
@@ -78,26 +105,41 @@ class Game {
 		
 		this.soundPlayer = new Yaje.SoundPlayer();
 		this.soundPlayer.register('shot', 'assets/shot.wav', 3);
+		
+		this.entities = [];
 	}
 	start() {
 		this.musicPlayer.play('default');
 		this.player = new Player();
+		
+		this.entities.push(this.player);
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
 		this.clock.update();
 		
-		this.player.update();
+		for (let i = 0; i < this.entities.length; ++i) {
+			let entity = this.entities[i];
+			entity.update();
+			if (entity.markedForRemoval) {
+				this.entities.splice(i, 1);
+				--i;
+			}
+		}
 		
 		this.draw();
 	}
-
 	draw() {
 		this.graphics.clear();
 		
-		this.player.draw();
+		for (var entity of this.entities) {
+			entity.draw();
+		}
 		
 		this.graphics.display();
+	}
+	addEntity(entity) {
+		this.entities.push(entity);
 	}
 }
 
