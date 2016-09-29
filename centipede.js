@@ -7,9 +7,19 @@ var MISSILE_SPEED = 800.0;
 class Entity {
 	constructor() {
 		this.markedForRemoval = false;
+		this.sprite = null;
 	}
 	remove() {
 		this.markedForRemoval = true;
+	}
+	draw() {
+		game.graphics.draw(this.sprite);
+	}
+	get x() {
+		return this.sprite.position[0];
+	}
+	get y() {
+		return this.sprite.position[1];
 	}
 }
 
@@ -54,25 +64,19 @@ class Player extends Entity {
 			}
 		}
 	}
-	draw() {
-		game.graphics.draw(this.sprite);
-	}
 }
 
 class Missile extends Entity {
 	constructor() {
 		super();
 		this.sprite = game.spritesheet.createSprite('missile');
-		this.sprite.setPosition(game.player.sprite.position[0] + 14, game.player.sprite.position[1]);
+		this.sprite.setPosition(game.player.x + 14, game.player.y);
 	}
 	update() {
 		this.sprite.move(0, -MISSILE_SPEED * game.clock.deltaTime);
 		if (this.sprite.position[1] < -100) {
 			this.remove();
 		}
-	}
-	draw() {
-		game.graphics.draw(this.sprite);
 	}
 }
 
