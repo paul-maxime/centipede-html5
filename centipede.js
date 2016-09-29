@@ -1,7 +1,7 @@
 'use strict';
 
 const SHOT_RELOAD_TIME = 0.2;
-const PLAYER_SPEED = 300.0;
+const PLAYER_SPEED = 400.0;
 const MISSILE_SPEED = 800.0;
 
 const GAME_WIDTH = 800;
