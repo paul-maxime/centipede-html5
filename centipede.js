@@ -2,7 +2,7 @@
 
 const SHOT_RELOAD_TIME = 0.2;
 const PLAYER_SPEED = 400.0;
-const MISSILE_SPEED = 800.0;
+const MISSILE_SPEED = 1200.0;
 
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
@@ -32,7 +32,7 @@ class Player extends Entity {
 		this.sprite = game.spritesheet.createSprite('player');
 		this.playerMovement = [0, 0];
 		this.shotTimer = SHOT_RELOAD_TIME;
-		
+
 		this.sprite.setPosition(GAME_WIDTH / 2 - 16, GAME_HEIGHT - 32);
 	}
 	update() {
@@ -56,7 +56,7 @@ class Player extends Entity {
 		vec2.normalize(this.playerMovement, this.playerMovement);
 		this.playerMovement[0] *= PLAYER_SPEED * game.clock.deltaTime;
 		this.playerMovement[1] *= PLAYER_SPEED * game.clock.deltaTime;
-		
+
 		this.sprite.move(this.playerMovement[0], this.playerMovement[1]);
 
 		if (this.x < 0) this.sprite.setPosition(1, this.y);
@@ -99,7 +99,7 @@ class Game {
 		}
 		this.input = new Yaje.Input(document, canvas);
 		this.clock = new Yaje.Clock();
-		
+
 		this.spritesheet = new Yaje.SpriteSheet(this.graphics.createTexture('assets/spritesheet.png'), 128, 128);
 		this.spritesheet.registerMany({
 			"centi-body" : [0, 0, 32, 32],
@@ -113,25 +113,25 @@ class Game {
 			"scorpion" : [66, 33, 32, 32],
 			"spider" : [66, 66, 32, 32]
 		});
-		
+
 		this.musicPlayer = new Yaje.MusicPlayer();
 		this.musicPlayer.register('default', 'assets/music.ogg');
-		
+
 		this.soundPlayer = new Yaje.SoundPlayer();
 		this.soundPlayer.register('shot', 'assets/shot.wav', 3);
-		
+
 		this.entities = [];
 	}
 	start() {
 		this.musicPlayer.play('default');
 		this.player = new Player();
-		
+
 		this.entities.push(this.player);
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
 		this.clock.update();
-		
+
 		for (let i = 0; i < this.entities.length; ++i) {
 			let entity = this.entities[i];
 			entity.update();
@@ -140,16 +140,16 @@ class Game {
 				--i;
 			}
 		}
-		
+
 		this.draw();
 	}
 	draw() {
 		this.graphics.clear();
-		
+
 		for (var entity of this.entities) {
 			entity.draw();
 		}
-		
+
 		this.graphics.display();
 	}
 	addEntity(entity) {
