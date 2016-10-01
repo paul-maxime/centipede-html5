@@ -8,13 +8,15 @@ const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
 
 class Entity {
-	constructor() {
+	constructor(type) {
+		this.type = type;
 		this.markedForRemoval = false;
 		this.sprite = null;
 	}
 	remove() {
 		this.markedForRemoval = true;
 	}
+	update() {}
 	draw() {
 		game.graphics.draw(this.sprite);
 	}
@@ -24,11 +26,41 @@ class Entity {
 	get y() {
 		return this.sprite.position[1];
 	}
+	get width() {
+		return this.sprite.width;
+	}
+	get height() {
+		return this.sprite.height;
+	}
+	intersectWith(entity) {
+		return !(
+			this.x + this.width < entity.x ||
+			this.x > entity.x + entity.width ||
+			this.y + this.height < entity.y ||
+			this.y > entity.y + entity.height
+		);
+	}
+}
+
+class Mushroom extends Entity {
+	constructor() {
+		super('Mushroom');
+		this.health = 4;
+		this.sprite = game.spritesheet.createSprite('mush-4');
+	}
+	hit() {
+		this.health--;
+		if (this.health > 0) {
+			this.sprite = game.spritesheet.createSprite('mush-' + this.health);
+		} else {
+			this.remove();
+		}
+	}
 }
 
 class Player extends Entity {
 	constructor() {
-		super();
+		super('Player');
 		this.sprite = game.spritesheet.createSprite('player');
 		this.playerMovement = [0, 0];
 		this.shotTimer = SHOT_RELOAD_TIME;
@@ -78,7 +110,7 @@ class Player extends Entity {
 
 class Missile extends Entity {
 	constructor() {
-		super();
+		super('Missile');
 		this.sprite = game.spritesheet.createSprite('missile');
 		this.sprite.setPosition(game.player.x + 14, game.player.y);
 	}
@@ -86,6 +118,15 @@ class Missile extends Entity {
 		this.sprite.move(0, -MISSILE_SPEED * game.clock.deltaTime);
 		if (this.sprite.position[1] < -100) {
 			this.remove();
+			return;
+		}
+		for (var i = 0; i < game.entities.length; ++i) {
+			if (game.entities[i].type === 'Mushroom' && this.intersectWith(game.entities[i])) {
+				game.entities[i].hit();
+				game.soundPlayer.play('little-pop');
+				this.remove();
+				return;
+			}
 		}
 	}
 }
@@ -105,10 +146,10 @@ class Game {
 			"centi-body" : [0, 0, 32, 32],
 			"centi-head" : [33, 0, 32, 32],
 			"missile" : [0, 99, 4, 12],
-			"mush01" : [66, 0, 32, 32],
-			"mush02" : [0, 33, 32, 32],
-			"mush03" : [33, 33, 32, 32],
-			"mush04" : [0, 66, 32, 32],
+			"mush-4" : [66, 0, 32, 32],
+			"mush-3" : [0, 33, 32, 32],
+			"mush-2" : [33, 33, 32, 32],
+			"mush-1" : [0, 66, 32, 32],
 			"player" : [33, 66, 32, 32],
 			"scorpion" : [66, 33, 32, 32],
 			"spider" : [66, 66, 32, 32]
@@ -119,6 +160,8 @@ class Game {
 
 		this.soundPlayer = new Yaje.SoundPlayer();
 		this.soundPlayer.register('shot', 'assets/shot.wav', 3);
+		this.soundPlayer.register('big-pop', 'assets/pop1.wav', 3);
+		this.soundPlayer.register('little-pop', 'assets/pop2.wav', 3);
 
 		this.entities = [];
 	}
@@ -127,6 +170,9 @@ class Game {
 		this.player = new Player();
 
 		this.entities.push(this.player);
+		
+		var test = new Mushroom();
+		this.entities.push(test);
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
