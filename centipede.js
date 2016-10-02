@@ -78,7 +78,7 @@ class Map {
 		}
 	}
 	spawnMushroom(x, y) {
-		if (this.mushrooms[x][y] === null) {
+		if (this.mushrooms[x][y] === null || this.mushrooms[x][y].markedForRemoval) {
 			this.mushrooms[x][y] = new Mushroom(x, y);
 			game.addEntity(this.mushrooms[x][y]);
 		} else {
