@@ -43,17 +43,46 @@ class Entity {
 }
 
 class Mushroom extends Entity {
-	constructor() {
+	constructor(x, y) {
 		super('Mushroom');
 		this.health = 4;
 		this.sprite = game.spritesheet.createSprite('mush-4');
+		this.sprite.setPosition(x * 32, y * 32);
 	}
 	hit() {
-		this.health--;
+		this.setHealth(this.health - 1);
+	}
+	restore() {
+		this.setHealth(4);
+	}
+	setHealth(health) {
+		this.health = health;
 		if (this.health > 0) {
 			game.spritesheet.setSpriteTexture(this.sprite, 'mush-' + this.health);
 		} else {
 			this.remove();
+		}
+	}
+}
+
+class Map {
+	constructor(width, height) {
+		this.width = width;
+		this.height = height;
+		this.mushrooms = [];
+		for (let x = 0; x < this.width; ++x) {
+			this.mushrooms[x] = [];
+			for (let y = 0; y < this.height; ++y) {
+				this.mushrooms[x][y] = null;
+			}
+		}
+	}
+	spawnMushroom(x, y) {
+		if (this.mushrooms[x][y] === null) {
+			this.mushrooms[x][y] = new Mushroom(x, y);
+			game.addEntity(this.mushrooms[x][y]);
+		} else {
+			this.mushrooms[x][y].restore();
 		}
 	}
 }
@@ -171,8 +200,13 @@ class Game {
 
 		this.entities.push(this.player);
 		
-		var test = new Mushroom();
-		this.entities.push(test);
+		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
+		this.map.spawnMushroom(0, 0);
+		this.map.spawnMushroom(2, 7);
+		this.map.spawnMushroom(4, 1);
+		this.map.spawnMushroom(6, 2);
+		this.map.spawnMushroom(12, 4);
+		this.map.spawnMushroom(11, 8);
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
