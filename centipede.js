@@ -51,7 +51,7 @@ class Mushroom extends Entity {
 	hit() {
 		this.health--;
 		if (this.health > 0) {
-			this.sprite = game.spritesheet.createSprite('mush-' + this.health);
+			game.spritesheet.setSpriteTexture(this.sprite, 'mush-' + this.health);
 		} else {
 			this.remove();
 		}
@@ -98,7 +98,7 @@ class Player extends Entity {
 	}
 	updateFire() {
 		if (this.shotTimer > 0) this.shotTimer -= game.clock.deltaTime;
-		if (game.input.isKeyDown(32)) {
+		if (game.input.isKeyDown(Yaje.Keys.SPACE)) {
 			if (this.shotTimer <= 0) {
 				this.shotTimer = SHOT_RELOAD_TIME;
 				game.soundPlayer.play('shot');
