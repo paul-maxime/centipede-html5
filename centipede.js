@@ -47,7 +47,7 @@ class Mushroom extends Entity {
 		super('Mushroom');
 		this.health = 4;
 		this.sprite = game.spritesheet.createSprite('mush-4');
-		this.sprite.setPosition(x * 32, y * 32);
+		this.sprite.setPosition(x * this.width, y * this.height);
 	}
 	hit() {
 		this.setHealth(this.health - 1);
@@ -94,7 +94,7 @@ class Player extends Entity {
 		this.playerMovement = [0, 0];
 		this.shotTimer = SHOT_RELOAD_TIME;
 
-		this.sprite.setPosition(GAME_WIDTH / 2 - 16, GAME_HEIGHT - 32);
+		this.sprite.setPosition(GAME_WIDTH / 2 - this.width / 2, GAME_HEIGHT - this.height);
 	}
 	update() {
 		this.updateMovement();
@@ -121,9 +121,9 @@ class Player extends Entity {
 		this.sprite.move(this.playerMovement[0], this.playerMovement[1]);
 
 		if (this.x < 0) this.sprite.setPosition(1, this.y);
-		if (this.x > GAME_WIDTH - 32) this.sprite.setPosition(GAME_WIDTH - 32, this.y);
+		if (this.x > GAME_WIDTH - this.width) this.sprite.setPosition(GAME_WIDTH - this.width, this.y);
 		if (this.y < GAME_HEIGHT / 3 * 2) this.sprite.setPosition(this.x, GAME_HEIGHT / 3 * 2);
-		if (this.y > GAME_HEIGHT - 32) this.sprite.setPosition(this.x, GAME_HEIGHT - 32);
+		if (this.y > GAME_HEIGHT - this.height) this.sprite.setPosition(this.x, GAME_HEIGHT - this.height);
 	}
 	updateFire() {
 		if (this.shotTimer > 0) this.shotTimer -= game.clock.deltaTime;
