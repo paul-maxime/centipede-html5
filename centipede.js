@@ -85,6 +85,13 @@ class Map {
 			this.mushrooms[x][y].restore();
 		}
 	}
+	spawnDefaultMushrooms() {
+		for (let i = 0; i < 15; ++i) {
+			var x = Math.floor(Math.random() * this.width);
+			var y = Math.floor(Math.random() * this.height * 2 / 3);
+			this.spawnMushroom(x, y);
+		}
+	}
 }
 
 class Player extends Entity {
@@ -201,12 +208,7 @@ class Game {
 		this.entities.push(this.player);
 		
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
-		this.map.spawnMushroom(0, 0);
-		this.map.spawnMushroom(2, 7);
-		this.map.spawnMushroom(4, 1);
-		this.map.spawnMushroom(6, 2);
-		this.map.spawnMushroom(12, 4);
-		this.map.spawnMushroom(11, 8);
+		this.map.spawnDefaultMushrooms();
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
