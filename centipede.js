@@ -163,7 +163,55 @@ class Missile extends Entity {
 				this.remove();
 				return;
 			}
+			if (game.entities[i].type === 'Centipede' && this.intersectWith(game.entities[i])) {
+				game.entities[i].hit();
+				game.soundPlayer.play('big-pop');
+				this.remove();
+				return;
+			}
 		}
+	}
+}
+
+class Centipede extends Entity {
+	constructor() {
+		super('Centipede');
+		this.mapX = 0;
+		this.mapY = 10;
+		this.sprite = game.spritesheet.createSprite('centi-body');
+	}
+	update () {
+		let inactive = true;
+		let newX;
+		let newY;
+		let finalX = this.mapX * 32;
+		let finalY = this.mapY * 32;
+		if (this.x < finalX - 1) {
+			newX = this.x + 100 * game.clock.deltaTime;
+			inactive = false;
+		} else if (this.x > finalX + 1) {
+			newX = this.x - 100 * game.clock.deltaTime;
+			inactive = false;
+		} else {
+			newX = this.x;
+		}
+		if (this.y < finalY - 1) {
+			newY = this.y + 100 * game.clock.deltaTime;
+			inactive = false;
+		} else if (this.y > finalY + 1) {
+			newY = this.y - 100 * game.clock.deltaTime;
+			inactive = false;
+		} else {
+			newY = this.y;
+		}
+		if (!inactive) {
+			this.sprite.setPosition(newX, newY);
+		} else {
+			this.mapX = 5;
+		}
+	}
+	hit() {
+		this.remove();
 	}
 }
 
@@ -209,6 +257,8 @@ class Game {
 		
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
 		this.map.spawnDefaultMushrooms();
+		
+		this.entities.push(new Centipede()); // test
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
