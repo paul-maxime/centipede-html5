@@ -124,13 +124,29 @@ class Player extends Entity {
 		vec2.normalize(this.playerMovement, this.playerMovement);
 		this.playerMovement[0] *= PLAYER_SPEED * game.clock.deltaTime;
 		this.playerMovement[1] *= PLAYER_SPEED * game.clock.deltaTime;
+		
+		this.sprite.move(this.playerMovement[0], 0);
+		if (this.isCollidingWithMushroom()) {
+			this.sprite.move(-this.playerMovement[0], 0);
+		}
 
-		this.sprite.move(this.playerMovement[0], this.playerMovement[1]);
+		this.sprite.move(0, this.playerMovement[1]);
+		if (this.isCollidingWithMushroom()) {
+			this.sprite.move(0, -this.playerMovement[1]);
+		}
 
 		if (this.x < 0) this.sprite.setPosition(1, this.y);
 		if (this.x > GAME_WIDTH - this.width) this.sprite.setPosition(GAME_WIDTH - this.width, this.y);
 		if (this.y < GAME_HEIGHT / 3 * 2) this.sprite.setPosition(this.x, GAME_HEIGHT / 3 * 2);
 		if (this.y > GAME_HEIGHT - this.height) this.sprite.setPosition(this.x, GAME_HEIGHT - this.height);
+	}
+	isCollidingWithMushroom() {
+		for (var i = 0; i < game.entities.length; ++i) {
+			if (game.entities[i].type === 'Mushroom' && this.intersectWith(game.entities[i])) {
+				return true;
+			}
+		}
+		return false;
 	}
 	updateFire() {
 		if (this.shotTimer > 0) this.shotTimer -= game.clock.deltaTime;
