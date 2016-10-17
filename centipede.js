@@ -33,12 +33,9 @@ class Entity {
 		return this.sprite.height;
 	}
 	intersectWith(entity) {
-		return !(
-			this.x + this.width < entity.x ||
-			this.x > entity.x + entity.width ||
-			this.y + this.height < entity.y ||
-			this.y > entity.y + entity.height
-		);
+		if (this.collider !== null && entity.collider !== null) {
+			return this.collider.intersectWith(entity.collider);
+		}
 	}
 }
 
@@ -48,6 +45,7 @@ class Mushroom extends Entity {
 		this.health = 4;
 		this.sprite = game.spritesheet.createSprite('mush-4');
 		this.sprite.setPosition(x * this.width, y * this.height);
+		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 	}
 	hit() {
 		this.setHealth(this.health - 1);
@@ -86,9 +84,10 @@ class Map {
 		}
 	}
 	spawnDefaultMushrooms() {
-		for (let i = 0; i < 15; ++i) {
+		let number = Math.floor(Math.random() * 10) + 20;
+		for (let i = 0; i < number; ++i) {
 			var x = Math.floor(Math.random() * this.width);
-			var y = Math.floor(Math.random() * this.height * 2 / 3);
+			var y = Math.floor(Math.random() * this.height);
 			this.spawnMushroom(x, y);
 		}
 	}
@@ -102,6 +101,7 @@ class Player extends Entity {
 		this.shotTimer = SHOT_RELOAD_TIME;
 
 		this.sprite.setPosition(GAME_WIDTH / 2 - this.width / 2, GAME_HEIGHT - this.height);
+		this.collider = new Yaje.BoxCollider(this.sprite, this.width / 2, this.height / 2, 1, 1);
 	}
 	update() {
 		this.updateMovement();
@@ -165,6 +165,7 @@ class Missile extends Entity {
 		super('Missile');
 		this.sprite = game.spritesheet.createSprite('missile');
 		this.sprite.setPosition(game.player.x + 14, game.player.y);
+		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 	}
 	update() {
 		this.sprite.move(0, -MISSILE_SPEED * game.clock.deltaTime);
@@ -195,6 +196,7 @@ class Centipede extends Entity {
 		this.mapX = 0;
 		this.mapY = 10;
 		this.sprite = game.spritesheet.createSprite('centi-body');
+		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 	}
 	update () {
 		let inactive = true;
