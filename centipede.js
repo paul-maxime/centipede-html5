@@ -270,13 +270,13 @@ class Game {
 	start() {
 		this.musicPlayer.play('default');
 		this.player = new Player();
-
-		this.entities.push(this.player);
 		
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
 		this.map.spawnDefaultMushrooms();
 		
 		this.entities.push(new Centipede()); // test
+
+		this.entities.push(this.player);
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
