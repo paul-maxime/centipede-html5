@@ -213,19 +213,19 @@ class Centipede extends Entity {
 		let requiredMovementX = Math.abs(finalX - this.x);
 		let requiredMovementY = Math.abs(finalY - this.y);
 		if (this.x < finalX - 1) {
-			newX = this.x + Math.min(requiredMovementX, 2000 * game.clock.deltaTime);
+			newX = this.x + Math.min(requiredMovementX, game.centipedeSpeed * game.clock.deltaTime);
 			inactive = false;
 		} else if (this.x > finalX + 1) {
-			newX = this.x - Math.min(requiredMovementX, 2000 * game.clock.deltaTime);
+			newX = this.x - Math.min(requiredMovementX, game.centipedeSpeed * game.clock.deltaTime);
 			inactive = false;
 		} else {
 			newX = this.x;
 		}
 		if (this.y < finalY - 1) {
-			newY = this.y + Math.min(requiredMovementY, 2000 * game.clock.deltaTime);
+			newY = this.y + Math.min(requiredMovementY, game.centipedeSpeed * game.clock.deltaTime);
 			inactive = false;
 		} else if (this.y > finalY + 1) {
-			newY = this.y - Math.min(requiredMovementY, 2000 * game.clock.deltaTime);
+			newY = this.y - Math.min(requiredMovementY, game.centipedeSpeed * game.clock.deltaTime);
 			inactive = false;
 		} else {
 			newY = this.y;
@@ -290,6 +290,8 @@ class Game {
 		this.soundPlayer.register('little-pop', 'assets/pop2.wav', 3);
 
 		this.entities = [];
+		
+		this.centipedeSpeed = 100;
 	}
 	start() {
 		this.musicPlayer.play('default');
