@@ -197,14 +197,22 @@ class Missile extends Entity {
 class Centipede extends Entity {
 	constructor() {
 		super('Centipede');
-		this.mapX = 0;
+		this.mapX = -1;
 		this.mapY = 0;
 		this.direction = 1;
 		this.verticalDirection = 1;
 		this.sprite = game.spritesheet.createSprite('centi-body');
+		this.sprite.setPosition(this.mapX * this.width, this.mapY * this.width)
 		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 	}
 	update() {
+		let inactive = this.moveToMapPosition();
+		if (inactive) {
+			this.moveToNextCell();
+			this.moveToMapPosition();
+		}
+	}
+	moveToMapPosition() {
 		let inactive = true;
 		let newX;
 		let newY;
@@ -232,24 +240,39 @@ class Centipede extends Entity {
 		}
 		if (!inactive) {
 			this.sprite.setPosition(newX, newY);
-		} else {
-			this.moveToNextCell();
 		}
+		return inactive;
 	}
 	moveToNextCell() {
 		let x = this.mapX + this.direction;
 		let y = this.mapY;
+		let nextDirection = this.direction;
+		let nextVerticalDirection = this.verticalDirection;
 		if (!game.map.isCellAccessible(x, y)) {
 			if ((this.verticalDirection === 1 && y >= game.map.height - 1) ||
 				(this.verticalDirection === -1 && y <= 0)) {
-				this.verticalDirection = this.verticalDirection * -1;
+				nextVerticalDirection = this.verticalDirection * -1;
 			}
 			x = this.mapX;
-			y = this.mapY + this.verticalDirection;
-			this.direction = this.direction * -1;
+			y = this.mapY + nextVerticalDirection;
+			nextDirection = this.direction * -1;
 		}
-		this.mapX = x;
-		this.mapY = y;
+		if (!this.isAnotherCentipedeOnCell(x, y)) {
+			this.mapX = x;
+			this.mapY = y;
+			this.direction = nextDirection;
+			this.verticalDirection = nextVerticalDirection;
+		}
+	}
+	isAnotherCentipedeOnCell(x, y) {
+		for (var i = 0; i < game.entities.length; ++i) {
+			if (game.entities[i].type === 'Centipede' &&
+				game.entities[i].mapX == x && game.entities[i].mapY == y &&
+				game.entities[i].direction == this.direction && game.entities[i].verticalDirection == this.verticalDirection) {
+				return true;
+			}
+		}
+		return false;
 	}
 	hit() {
 		game.map.spawnMushroom(this.mapX, this.mapY);
@@ -291,7 +314,7 @@ class Game {
 
 		this.entities = [];
 		
-		this.centipedeSpeed = 100;
+		this.centipedeSpeed = 300;
 	}
 	start() {
 		this.musicPlayer.play('default');
@@ -300,7 +323,9 @@ class Game {
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
 		this.map.spawnDefaultMushrooms();
 		
-		this.entities.push(new Centipede()); // test
+		for (let i = 0; i < 30; ++i) { // TEST
+			this.entities.push(new Centipede());
+		}
 
 		this.entities.push(this.player);
 	}
