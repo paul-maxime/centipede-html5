@@ -91,6 +91,10 @@ class Map {
 			this.spawnMushroom(x, y);
 		}
 	}
+	isCellAccessible(x, y) {
+		return x >= 0 && y >= 0 && x < this.width && y < this.height &&
+			(this.mushrooms[x][y] === null || this.mushrooms[x][y].markedForRemoval);
+	}
 }
 
 class Player extends Entity {
@@ -194,11 +198,12 @@ class Centipede extends Entity {
 	constructor() {
 		super('Centipede');
 		this.mapX = 0;
-		this.mapY = 10;
+		this.mapY = 0;
+		this.direction = 1;
 		this.sprite = game.spritesheet.createSprite('centi-body');
 		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 	}
-	update () {
+	update() {
 		let inactive = true;
 		let newX;
 		let newY;
@@ -225,10 +230,22 @@ class Centipede extends Entity {
 		if (!inactive) {
 			this.sprite.setPosition(newX, newY);
 		} else {
-			this.mapX = 5;
+			this.moveToNextCell();
 		}
 	}
+	moveToNextCell() {
+		let x = this.mapX + this.direction;
+		let y = this.mapY;
+		if (!game.map.isCellAccessible(x, y)) {
+			x = this.mapX;
+			y = this.mapY + 1;
+			this.direction = this.direction * -1;
+		}
+		this.mapX = x;
+		this.mapY = y;
+	}
 	hit() {
+		game.map.spawnMushroom(this.mapX, this.mapY);
 		this.remove();
 	}
 }
