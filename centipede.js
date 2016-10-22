@@ -5,7 +5,7 @@ const PLAYER_SPEED = 400.0;
 const MISSILE_SPEED = 1200.0;
 
 const GAME_WIDTH = 800;
-const GAME_HEIGHT = 600;
+const GAME_HEIGHT = 640;
 
 class Entity {
 	constructor(type) {
@@ -200,6 +200,7 @@ class Centipede extends Entity {
 		this.mapX = 0;
 		this.mapY = 0;
 		this.direction = 1;
+		this.verticalDirection = 1;
 		this.sprite = game.spritesheet.createSprite('centi-body');
 		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 	}
@@ -209,20 +210,22 @@ class Centipede extends Entity {
 		let newY;
 		let finalX = this.mapX * 32;
 		let finalY = this.mapY * 32;
+		let requiredMovementX = Math.abs(finalX - this.x);
+		let requiredMovementY = Math.abs(finalY - this.y);
 		if (this.x < finalX - 1) {
-			newX = this.x + 100 * game.clock.deltaTime;
+			newX = this.x + Math.min(requiredMovementX, 2000 * game.clock.deltaTime);
 			inactive = false;
 		} else if (this.x > finalX + 1) {
-			newX = this.x - 100 * game.clock.deltaTime;
+			newX = this.x - Math.min(requiredMovementX, 2000 * game.clock.deltaTime);
 			inactive = false;
 		} else {
 			newX = this.x;
 		}
 		if (this.y < finalY - 1) {
-			newY = this.y + 100 * game.clock.deltaTime;
+			newY = this.y + Math.min(requiredMovementY, 2000 * game.clock.deltaTime);
 			inactive = false;
 		} else if (this.y > finalY + 1) {
-			newY = this.y - 100 * game.clock.deltaTime;
+			newY = this.y - Math.min(requiredMovementY, 2000 * game.clock.deltaTime);
 			inactive = false;
 		} else {
 			newY = this.y;
@@ -237,8 +240,12 @@ class Centipede extends Entity {
 		let x = this.mapX + this.direction;
 		let y = this.mapY;
 		if (!game.map.isCellAccessible(x, y)) {
+			if ((this.verticalDirection === 1 && y >= game.map.height - 1) ||
+				(this.verticalDirection === -1 && y <= 0)) {
+				this.verticalDirection = this.verticalDirection * -1;
+			}
 			x = this.mapX;
-			y = this.mapY + 1;
+			y = this.mapY + this.verticalDirection;
 			this.direction = this.direction * -1;
 		}
 		this.mapX = x;
