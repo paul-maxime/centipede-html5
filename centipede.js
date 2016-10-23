@@ -204,6 +204,7 @@ class Centipede extends Entity {
 		this.sprite = game.spritesheet.createSprite('centi-body');
 		this.sprite.setPosition(this.mapX * this.width, this.mapY * this.width)
 		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
+		game.remainingParts += 1;
 	}
 	update() {
 		let inactive = this.moveToMapPosition();
@@ -277,6 +278,7 @@ class Centipede extends Entity {
 	hit() {
 		game.map.spawnMushroom(this.mapX, this.mapY);
 		this.remove();
+		game.remainingParts -= 1;
 	}
 }
 
@@ -314,7 +316,9 @@ class Game {
 
 		this.entities = [];
 		
-		this.centipedeSpeed = 300;
+		this.centipedeSpeed = 0;
+		this.level = 0;
+		this.remainingParts = 0;
 	}
 	start() {
 		this.musicPlayer.play('default');
@@ -322,16 +326,16 @@ class Game {
 		
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
 		this.map.spawnDefaultMushrooms();
-		
-		for (let i = 0; i < 30; ++i) { // TEST
-			this.entities.push(new Centipede());
-		}
 
 		this.entities.push(this.player);
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
 		this.clock.update();
+
+		if (this.remainingParts === 0) {
+			this.nextLevel();
+		}
 
 		for (let i = 0; i < this.entities.length; ++i) {
 			let entity = this.entities[i];
@@ -343,6 +347,13 @@ class Game {
 		}
 
 		this.draw();
+	}
+	nextLevel() {
+		this.level += 1;
+		this.centipedeSpeed = 100 + 25 * this.level;
+		for (let i = 0; i < this.level * 5; ++i) {
+			this.entities.push(new Centipede());
+		}
 	}
 	draw() {
 		this.graphics.clear();
