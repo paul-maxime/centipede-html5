@@ -354,6 +354,16 @@ class Game {
 		for (let i = 0; i < this.level * 5; ++i) {
 			this.entities.push(new Centipede());
 		}
+		this.setColors();
+	}
+	setColors() {
+		let color = Game.colors[(this.level - 1) % Game.colors.length];
+		this.colorR = ((color >> 16) & 0xFF) / 0xFF;
+		this.colorG = ((color >> 8) & 0xFF) / 0xFF;
+		this.colorB = (color & 0xFF) / 0xFF;
+		for (let i = 0; i < this.entities.length; ++i) {
+			this.entities[i].sprite.setColor(this.colorR, this.colorG, this.colorB, 0xFF);
+		}
 	}
 	draw() {
 		this.graphics.clear();
@@ -365,9 +375,12 @@ class Game {
 		this.graphics.display();
 	}
 	addEntity(entity) {
+		entity.sprite.setColor(this.colorR, this.colorG, this.colorB, 0xFF);
 		this.entities.push(entity);
 	}
 }
+
+Game.colors = [0xF02020, 0x20F020, 0x2020F0];
 
 (function () {
 	window.game = new Game();
