@@ -49,6 +49,9 @@ class Mushroom extends Entity {
 	}
 	hit() {
 		this.setHealth(this.health - 1);
+		if (this.health === 0) {
+			game.score += 1;
+		}
 	}
 	restore() {
 		this.setHealth(4);
@@ -279,6 +282,7 @@ class Centipede extends Entity {
 		game.map.spawnMushroom(this.mapX, this.mapY);
 		this.remove();
 		game.remainingParts -= 1;
+		game.score += 10; // TODO HEAD?
 	}
 }
 
@@ -316,6 +320,7 @@ class Game {
 
 		this.entities = [];
 		
+		this.score = 0;
 		this.centipedeSpeed = 0;
 		this.level = 0;
 		this.remainingParts = 0;
