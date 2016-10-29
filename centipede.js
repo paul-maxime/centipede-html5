@@ -229,19 +229,19 @@ class Centipede extends Entity {
 		let finalY = this.mapY * 32;
 		let requiredMovementX = Math.abs(finalX - this.x);
 		let requiredMovementY = Math.abs(finalY - this.y);
-		if (this.x < finalX - 1) {
+		if (this.x < finalX - 0.01) {
 			newX = this.x + Math.min(requiredMovementX, game.centipedeSpeed * game.clock.deltaTime);
 			inactive = false;
-		} else if (this.x > finalX + 1) {
+		} else if (this.x > finalX + 0.01) {
 			newX = this.x - Math.min(requiredMovementX, game.centipedeSpeed * game.clock.deltaTime);
 			inactive = false;
 		} else {
 			newX = this.x;
 		}
-		if (this.y < finalY - 1) {
+		if (this.y < finalY - 0.01) {
 			newY = this.y + Math.min(requiredMovementY, game.centipedeSpeed * game.clock.deltaTime);
 			inactive = false;
-		} else if (this.y > finalY + 1) {
+		} else if (this.y > finalY + 0.01) {
 			newY = this.y - Math.min(requiredMovementY, game.centipedeSpeed * game.clock.deltaTime);
 			inactive = false;
 		} else {
