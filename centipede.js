@@ -198,18 +198,23 @@ class Missile extends Entity {
 }
 
 class Centipede extends Entity {
-	constructor() {
+	constructor(parent) {
 		super('Centipede');
+		this.parent = parent;
 		this.mapX = -1;
 		this.mapY = 0;
 		this.direction = 1;
 		this.verticalDirection = 1;
-		this.sprite = game.spritesheet.createSprite('centi-body');
+		this.sprite = game.spritesheet.createSprite(this.parent === null ? 'centi-head' : 'centi-body');
 		this.sprite.setPosition(this.mapX * this.width, this.mapY * this.width)
 		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 		game.remainingParts += 1;
 	}
 	update() {
+		if (this.parent !== null && this.parent.markedForRemoval) {
+			this.parent = null;
+			game.spritesheet.setSpriteTexture(this.sprite, 'centi-head');
+		}
 		let inactive = this.moveToMapPosition();
 		if (inactive) {
 			this.moveToNextCell();
@@ -282,7 +287,7 @@ class Centipede extends Entity {
 		game.map.spawnMushroom(this.mapX, this.mapY);
 		this.remove();
 		game.remainingParts -= 1;
-		game.score += 10; // TODO HEAD?
+		game.score += this.parent === null ? 20 : 10;
 	}
 }
 
@@ -356,8 +361,10 @@ class Game {
 	nextLevel() {
 		this.level += 1;
 		this.centipedeSpeed = 100 + 25 * this.level;
+		let centipedePart = null;
 		for (let i = 0; i < this.level * 5; ++i) {
-			this.entities.push(new Centipede());
+			centipedePart = new Centipede(centipedePart);
+			this.entities.push(centipedePart);
 		}
 		this.setColors();
 	}
