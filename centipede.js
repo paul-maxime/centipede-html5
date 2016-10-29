@@ -50,7 +50,7 @@ class Mushroom extends Entity {
 	hit() {
 		this.setHealth(this.health - 1);
 		if (this.health === 0) {
-			game.score += 1;
+			game.updateScore(1);
 		}
 	}
 	restore() {
@@ -295,7 +295,7 @@ class Centipede extends Entity {
 		game.map.spawnMushroom(this.mapX, this.mapY);
 		this.remove();
 		game.remainingParts -= 1;
-		game.score += this.parent === null ? 20 : 10;
+		game.updateScore(this.parent === null ? 20 : 10);
 	}
 }
 
@@ -340,6 +340,8 @@ class Game {
 	}
 	start() {
 		this.musicPlayer.play('default');
+		this.updateScore(0);
+		
 		this.player = new Player();
 		
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
@@ -351,10 +353,6 @@ class Game {
 		requestAnimationFrame(() => this.update());
 		this.clock.update();
 
-		if (this.remainingParts === 0) {
-			this.nextLevel();
-		}
-
 		for (let i = 0; i < this.entities.length; ++i) {
 			let entity = this.entities[i];
 			entity.update();
@@ -362,6 +360,10 @@ class Game {
 				this.entities.splice(i, 1);
 				--i;
 			}
+		}
+
+		if (this.remainingParts === 0) {
+			this.nextLevel();
 		}
 
 		this.draw();
@@ -404,6 +406,10 @@ class Game {
 	addEntity(entity) {
 		this.setEntityColor(entity);
 		this.entities.push(entity);
+	}
+	updateScore(delta) {
+		this.score += delta;
+		document.getElementById('game-score-value').innerHTML = this.score;
 	}
 }
 
