@@ -90,7 +90,7 @@ class Map {
 		let number = Math.floor(Math.random() * 10) + 20;
 		for (let i = 0; i < number; ++i) {
 			var x = Math.floor(Math.random() * this.width);
-			var y = Math.floor(Math.random() * this.height);
+			var y = Math.floor(Math.random() * (this.height - 1));
 			this.spawnMushroom(x, y);
 		}
 	}
