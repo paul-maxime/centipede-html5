@@ -382,7 +382,14 @@ class Game {
 		this.colorG = ((color >> 8) & 0xFF) / 0xFF;
 		this.colorB = (color & 0xFF) / 0xFF;
 		for (let i = 0; i < this.entities.length; ++i) {
-			this.entities[i].sprite.setColor(this.colorR, this.colorG, this.colorB, 0xFF);
+			this.setEntityColor(this.entities[i]);
+		}
+	}
+	setEntityColor(entity) {
+		if (entity.type == 'Mushroom') {
+			entity.sprite.setColor(this.colorR, this.colorG, this.colorB, 1.0);
+		} else {
+			entity.sprite.setColor(1.0 - this.colorR, 1.0 - this.colorG, 1.0 - this.colorB, 1.0);
 		}
 	}
 	draw() {
@@ -395,7 +402,7 @@ class Game {
 		this.graphics.display();
 	}
 	addEntity(entity) {
-		entity.sprite.setColor(this.colorR, this.colorG, this.colorB, 0xFF);
+		this.setEntityColor(entity);
 		this.entities.push(entity);
 	}
 }
