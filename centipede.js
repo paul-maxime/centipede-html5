@@ -356,6 +356,7 @@ class Game {
 	update() {
 		requestAnimationFrame(() => this.update());
 		this.clock.update();
+		this.input.update();
 
 		for (let i = 0; i < this.entities.length; ++i) {
 			let entity = this.entities[i];
@@ -366,7 +367,7 @@ class Game {
 			}
 		}
 
-		if (this.remainingParts === 0) {
+		if (this.remainingParts === 0 || this.input.wasKeyPressed(Yaje.Keys.L)) {
 			this.nextLevel();
 		}
 
@@ -417,7 +418,7 @@ class Game {
 	}
 }
 
-Game.colors = [0xF02020, 0x20F020, 0x2020F0];
+Game.colors = [0x20F020, 0x3040F0, 0xF02020];
 
 (function () {
 	window.game = new Game();
