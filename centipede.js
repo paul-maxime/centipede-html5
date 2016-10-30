@@ -113,6 +113,7 @@ class Player extends Entity {
 	update() {
 		this.updateMovement();
 		this.updateFire();
+		this.updateCollisions();
 	}
 	updateMovement() {
 		vec2.set(this.playerMovement, 0, 0);
@@ -162,6 +163,15 @@ class Player extends Entity {
 				this.shotTimer = SHOT_RELOAD_TIME;
 				game.soundPlayer.play('shot');
 				game.addEntity(new Missile());
+			}
+		}
+	}
+	updateCollisions() {
+		for (var i = 0; i < game.entities.length; ++i) {
+			if (game.entities[i].type === 'Centipede' && this.intersectWith(game.entities[i])) {
+				game.soundPlayer.play('explosion');
+				this.remove();
+				return;
 			}
 		}
 	}
@@ -334,6 +344,7 @@ class Game {
 		this.soundPlayer.register('shot', 'assets/shot.wav', 3);
 		this.soundPlayer.register('big-pop', 'assets/pop1.wav', 3);
 		this.soundPlayer.register('little-pop', 'assets/pop2.wav', 3);
+		this.soundPlayer.register('explosion', 'assets/explosion.ogg');
 
 		this.entities = [];
 		
