@@ -198,11 +198,11 @@ class Missile extends Entity {
 }
 
 class Centipede extends Entity {
-	constructor(parent) {
+	constructor(parent, x, y) {
 		super('Centipede');
 		this.parent = parent;
-		this.mapX = -1;
-		this.mapY = 0;
+		this.mapX = x;
+		this.mapY = y;
 		this.direction = 1;
 		this.verticalDirection = 1;
 		this.sprite = game.spritesheet.createSprite(this.parent === null ? 'centi-head' : 'centi-body');
@@ -263,6 +263,10 @@ class Centipede extends Entity {
 	moveToNextCell() {
 		let x = this.mapX + this.direction;
 		let y = this.mapY;
+		if (this.mapY < 0) {
+			this.mapY = y + 1;
+			return;
+		}
 		let nextDirection = this.direction;
 		let nextVerticalDirection = this.verticalDirection;
 		if (!game.map.isCellAccessible(x, y)) {
@@ -373,7 +377,7 @@ class Game {
 		this.centipedeSpeed = 100 + 25 * this.level;
 		let centipedePart = null;
 		for (let i = 0; i < this.level * 5; ++i) {
-			centipedePart = new Centipede(centipedePart);
+			centipedePart = new Centipede(centipedePart, Math.floor(this.map.width / 2), -1 - i);
 			this.entities.push(centipedePart);
 		}
 		this.setColors();
