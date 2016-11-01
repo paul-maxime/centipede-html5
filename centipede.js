@@ -4,6 +4,9 @@ const SHOT_RELOAD_TIME = 0.2;
 const PLAYER_SPEED = 400.0;
 const MISSILE_SPEED = 1200.0;
 
+const CENTIPEDE_INITIAL_SPEED = 1000;
+const CENTIPEDE_SPEED_PER_LEVEL = 25;
+
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 640;
 
@@ -70,6 +73,7 @@ class Map {
 	constructor(width, height) {
 		this.width = width;
 		this.height = height;
+		this.heightLimit = Math.floor(height / 3 * 2);
 		this.mushrooms = [];
 		for (let x = 0; x < this.width; ++x) {
 			this.mushrooms[x] = [];
@@ -281,7 +285,7 @@ class Centipede extends Entity {
 		let nextVerticalDirection = this.verticalDirection;
 		if (!game.map.isCellAccessible(x, y)) {
 			if ((this.verticalDirection === 1 && y >= game.map.height - 1) ||
-				(this.verticalDirection === -1 && y <= 0)) {
+				(this.verticalDirection === -1 && y <= game.map.heightLimit)) {
 				nextVerticalDirection = this.verticalDirection * -1;
 			}
 			x = this.mapX;
@@ -386,7 +390,7 @@ class Game {
 	}
 	nextLevel() {
 		this.level += 1;
-		this.centipedeSpeed = 100 + 25 * this.level;
+		this.centipedeSpeed = CENTIPEDE_INITIAL_SPEED + CENTIPEDE_SPEED_PER_LEVEL * this.level;
 		let centipedePart = null;
 		for (let i = 0; i < this.level * 5; ++i) {
 			centipedePart = new Centipede(centipedePart, Math.floor(this.map.width / 2), -1 - i);
