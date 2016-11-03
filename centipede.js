@@ -380,8 +380,6 @@ class Game {
 		
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
 		this.map.spawnDefaultMushrooms();
-
-		this.entities.push(this.player);
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
@@ -404,7 +402,7 @@ class Game {
 					this.spawnPlayer();
 					this.nextLevel();
 				} else {
-					this.mushroomTimer = 0.25;
+					this.mushroomTimer = 0.15;
 				}
 			}
 		} else if (this.remainingParts === 0 || this.input.wasKeyPressed(Yaje.Keys.L)) {
@@ -416,6 +414,7 @@ class Game {
 	spawnPlayer() {
 		this.player = new Player();
 		this.isPlayerDead = false;
+		this.entities.push(this.player);
 	}
 	nextLevel() {
 		this.level += 1;
