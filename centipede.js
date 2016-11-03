@@ -104,6 +104,7 @@ class Map {
 				if (this.mushrooms[x][y] !== null && !this.mushrooms[x][y].markedForRemoval && this.mushrooms[x][y].health < 4) {
 					this.mushrooms[x][y].setHealth(4);
 					game.soundPlayer.play('little-pop');
+					game.updateScore(10);
 					return true;
 				}
 			}
