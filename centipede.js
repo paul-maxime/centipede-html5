@@ -188,7 +188,7 @@ class Player extends Entity {
 			if (game.entities[i].type === 'Centipede' && this.intersectWith(game.entities[i])) {
 				game.soundPlayer.play('explosion');
 				this.remove();
-				game.die();
+				game.killPlayer();
 				return;
 			}
 		}
@@ -373,7 +373,6 @@ class Game {
 		this.mushroomTimer = 0;
 	}
 	start() {
-		this.musicPlayer.play('default');
 		this.updateScore(0);
 		
 		this.spawnPlayer();
@@ -415,6 +414,7 @@ class Game {
 		this.player = new Player();
 		this.isPlayerDead = false;
 		this.entities.push(this.player);
+		this.musicPlayer.play('default');
 	}
 	nextLevel() {
 		this.level += 1;
@@ -426,7 +426,7 @@ class Game {
 		}
 		this.setColors();
 	}
-	die() {
+	killPlayer() {
 		this.isPlayerDead = true;
 		this.remainingParts = 0;
 		for (var i = 0; i < game.entities.length; ++i) {
@@ -434,7 +434,8 @@ class Game {
 				game.entities[i].remove();
 			}
 		}
-		this.mushroomTimer = 1.0;
+		this.mushroomTimer = 1.5;
+		this.musicPlayer.stop();
 	}
 	setColors() {
 		let color = Game.colors[(this.level - 1) % Game.colors.length];
