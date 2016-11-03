@@ -98,6 +98,18 @@ class Map {
 			this.spawnMushroom(x, y);
 		}
 	}
+	restoreNextMushroom() {
+		for (let x = 0; x < this.width; ++x) {
+			for (let y = 0; y < this.height; ++y) {
+				if (this.mushrooms[x][y] !== null && !this.mushrooms[x][y].markedForRemoval && this.mushrooms[x][y].health < 4) {
+					this.mushrooms[x][y].setHealth(4);
+					game.soundPlayer.play('little-pop');
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	isCellAccessible(x, y) {
 		return x >= 0 && y >= 0 && x < this.width && y < this.height &&
 			(this.mushrooms[x][y] === null || this.mushrooms[x][y].markedForRemoval);
@@ -175,6 +187,7 @@ class Player extends Entity {
 			if (game.entities[i].type === 'Centipede' && this.intersectWith(game.entities[i])) {
 				game.soundPlayer.play('explosion');
 				this.remove();
+				game.die();
 				return;
 			}
 		}
@@ -356,12 +369,13 @@ class Game {
 		this.centipedeSpeed = 0;
 		this.level = 0;
 		this.remainingParts = 0;
+		this.mushroomTimer = 0;
 	}
 	start() {
 		this.musicPlayer.play('default');
 		this.updateScore(0);
 		
-		this.player = new Player();
+		this.spawnPlayer();
 		
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
 		this.map.spawnDefaultMushrooms();
@@ -382,11 +396,25 @@ class Game {
 			}
 		}
 
-		if (this.remainingParts === 0 || this.input.wasKeyPressed(Yaje.Keys.L)) {
+		if (this.isPlayerDead) {
+			this.mushroomTimer -= this.clock.deltaTime;
+			if (this.mushroomTimer <= 0) {
+				if (!this.map.restoreNextMushroom()) {
+					this.spawnPlayer();
+					this.nextLevel();
+				} else {
+					this.mushroomTimer = 0.25;
+				}
+			}
+		} else if (this.remainingParts === 0 || this.input.wasKeyPressed(Yaje.Keys.L)) {
 			this.nextLevel();
 		}
 
 		this.draw();
+	}
+	spawnPlayer() {
+		this.player = new Player();
+		this.isPlayerDead = false;
 	}
 	nextLevel() {
 		this.level += 1;
@@ -397,6 +425,16 @@ class Game {
 			this.entities.push(centipedePart);
 		}
 		this.setColors();
+	}
+	die() {
+		this.isPlayerDead = true;
+		this.remainingParts = 0;
+		for (var i = 0; i < game.entities.length; ++i) {
+			if (game.entities[i].type === 'Centipede') {
+				game.entities[i].remove();
+			}
+		}
+		this.mushroomTimer = 1.0;
 	}
 	setColors() {
 		let color = Game.colors[(this.level - 1) % Game.colors.length];
