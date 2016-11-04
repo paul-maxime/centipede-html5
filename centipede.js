@@ -499,7 +499,7 @@ class Game extends Scene {
 	}
 	updateScore(delta) {
 		this.score += delta;
-		document.getElementById('game-score-value').innerHTML = this.score;
+		document.getElementById('game-score').innerHTML = this.score;
 	}
 }
 
