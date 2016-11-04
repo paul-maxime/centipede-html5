@@ -14,27 +14,31 @@
 			position: relative;
 			margin: 0 auto;
 		}
-		#game-canvas {
-			background-color: black;
-		}
-		#game-overlay {
-			position: absolute;
-			left: 0;
-			top: 0;
-		}
-		#game-score {
+		#game-container p {
 			margin: 0;
 			color: white;
 			font-family: "Future", monospace;
 			font-size: 32px;
+		}
+		#game-canvas {
+			background-color: black;
+		}
+		.game-scene {
+			display: none;
+			position: absolute;
+			left: 0;
+			top: 0;
 		}
 		</style>
 	</head>
 	<body>
 		<div id="game-container">
 			<canvas id="game-canvas" width="800" height="640"></canvas>
-			<div id="game-overlay">
+			<div id="game-overlay" class="game-scene">
 				<p id="game-score">Score: <span id="game-score-value"></span></p>
+			</div>
+			<div id="game-main-menu" class="game-scene">
+				<p id="game-play-button">Play</p>
 			</div>
 		</div>
 		<script src="lib/gl-matrix-2.3.2.min.js"></script>

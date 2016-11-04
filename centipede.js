@@ -21,7 +21,7 @@ class Entity {
 	}
 	update() {}
 	draw() {
-		game.graphics.draw(this.sprite);
+		app.graphics.draw(this.sprite);
 	}
 	get x() {
 		return this.sprite.position[0];
@@ -46,7 +46,7 @@ class Mushroom extends Entity {
 	constructor(x, y) {
 		super('Mushroom');
 		this.health = 4;
-		this.sprite = game.spritesheet.createSprite('mush-4');
+		this.sprite = app.spritesheet.createSprite('mush-4');
 		this.sprite.setPosition(x * this.width, y * this.height);
 		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 	}
@@ -62,7 +62,7 @@ class Mushroom extends Entity {
 	setHealth(health) {
 		this.health = health;
 		if (this.health > 0) {
-			game.spritesheet.setSpriteTexture(this.sprite, 'mush-' + this.health);
+			app.spritesheet.setSpriteTexture(this.sprite, 'mush-' + this.health);
 		} else {
 			this.remove();
 		}
@@ -103,7 +103,7 @@ class Map {
 			for (let y = 0; y < this.height; ++y) {
 				if (this.mushrooms[x][y] !== null && !this.mushrooms[x][y].markedForRemoval && this.mushrooms[x][y].health < 4) {
 					this.mushrooms[x][y].setHealth(4);
-					game.soundPlayer.play('little-pop');
+					app.soundPlayer.play('little-pop');
 					game.updateScore(5);
 					return true;
 				}
@@ -120,7 +120,7 @@ class Map {
 class Player extends Entity {
 	constructor() {
 		super('Player');
-		this.sprite = game.spritesheet.createSprite('player');
+		this.sprite = app.spritesheet.createSprite('player');
 		this.playerMovement = [0, 0];
 		this.shotTimer = SHOT_RELOAD_TIME;
 
@@ -134,21 +134,21 @@ class Player extends Entity {
 	}
 	updateMovement() {
 		vec2.set(this.playerMovement, 0, 0);
-		if (game.input.isKeyDown(Yaje.Keys.ARROW_UP)) {
+		if (app.input.isKeyDown(Yaje.Keys.ARROW_UP)) {
 			this.playerMovement[1] -= 1;
 		}
-		if (game.input.isKeyDown(Yaje.Keys.ARROW_DOWN)) {
+		if (app.input.isKeyDown(Yaje.Keys.ARROW_DOWN)) {
 			this.playerMovement[1] += 1;
 		}
-		if (game.input.isKeyDown(Yaje.Keys.ARROW_LEFT)) {
+		if (app.input.isKeyDown(Yaje.Keys.ARROW_LEFT)) {
 			this.playerMovement[0] -= 1;
 		}
-		if (game.input.isKeyDown(Yaje.Keys.ARROW_RIGHT)) {
+		if (app.input.isKeyDown(Yaje.Keys.ARROW_RIGHT)) {
 			this.playerMovement[0] += 1;
 		}
 		vec2.normalize(this.playerMovement, this.playerMovement);
-		this.playerMovement[0] *= PLAYER_SPEED * game.clock.deltaTime;
-		this.playerMovement[1] *= PLAYER_SPEED * game.clock.deltaTime;
+		this.playerMovement[0] *= PLAYER_SPEED * app.clock.deltaTime;
+		this.playerMovement[1] *= PLAYER_SPEED * app.clock.deltaTime;
 
 		this.sprite.move(this.playerMovement[0], 0);
 		if (this.isCollidingWithMushroom()) {
@@ -174,11 +174,11 @@ class Player extends Entity {
 		return false;
 	}
 	updateFire() {
-		if (this.shotTimer > 0) this.shotTimer -= game.clock.deltaTime;
-		if (game.input.isKeyDown(Yaje.Keys.SPACE)) {
+		if (this.shotTimer > 0) this.shotTimer -= app.clock.deltaTime;
+		if (app.input.isKeyDown(Yaje.Keys.SPACE)) {
 			if (this.shotTimer <= 0) {
 				this.shotTimer = SHOT_RELOAD_TIME;
-				game.soundPlayer.play('shot');
+				app.soundPlayer.play('shot');
 				game.addEntity(new Missile());
 			}
 		}
@@ -186,7 +186,7 @@ class Player extends Entity {
 	updateCollisions() {
 		for (var i = 0; i < game.entities.length; ++i) {
 			if (game.entities[i].type === 'Centipede' && this.intersectWith(game.entities[i])) {
-				game.soundPlayer.play('explosion');
+				app.soundPlayer.play('explosion');
 				this.remove();
 				game.killPlayer();
 				return;
@@ -198,12 +198,12 @@ class Player extends Entity {
 class Missile extends Entity {
 	constructor() {
 		super('Missile');
-		this.sprite = game.spritesheet.createSprite('missile');
+		this.sprite = app.spritesheet.createSprite('missile');
 		this.sprite.setPosition(game.player.x + 14, game.player.y);
 		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 	}
 	update() {
-		this.sprite.move(0, -MISSILE_SPEED * game.clock.deltaTime);
+		this.sprite.move(0, -MISSILE_SPEED * app.clock.deltaTime);
 		if (this.sprite.position[1] < -100) {
 			this.remove();
 			return;
@@ -211,13 +211,13 @@ class Missile extends Entity {
 		for (var i = 0; i < game.entities.length; ++i) {
 			if (game.entities[i].type === 'Mushroom' && this.intersectWith(game.entities[i])) {
 				game.entities[i].hit();
-				game.soundPlayer.play('little-pop');
+				app.soundPlayer.play('little-pop');
 				this.remove();
 				return;
 			}
 			if (game.entities[i].type === 'Centipede' && this.intersectWith(game.entities[i])) {
 				game.entities[i].hit();
-				game.soundPlayer.play('big-pop');
+				app.soundPlayer.play('big-pop');
 				this.remove();
 				return;
 			}
@@ -233,7 +233,7 @@ class Centipede extends Entity {
 		this.mapY = y;
 		this.direction = 1;
 		this.verticalDirection = 1;
-		this.sprite = game.spritesheet.createSprite(this.parent === null ? 'centi-head' : 'centi-body');
+		this.sprite = app.spritesheet.createSprite(this.parent === null ? 'centi-head' : 'centi-body');
 		this.sprite.setPosition(this.mapX * this.width, this.mapY * this.width)
 		this.collider = new Yaje.BoxCollider(this.sprite, 0, 0, this.width, this.height);
 		game.remainingParts += 1;
@@ -241,7 +241,7 @@ class Centipede extends Entity {
 	update() {
 		if (this.parent !== null && this.parent.markedForRemoval) {
 			this.parent = null;
-			game.spritesheet.setSpriteTexture(this.sprite, 'centi-head');
+			app.spritesheet.setSpriteTexture(this.sprite, 'centi-head');
 		}
 		let inactive = this.moveToMapPosition();
 		if (inactive) {
@@ -259,22 +259,22 @@ class Centipede extends Entity {
 		let requiredMovementY = Math.abs(finalY - this.y);
 		let rotation = 0;
 		if (this.x < finalX - 0.01) {
-			newX = this.x + Math.min(requiredMovementX, game.centipedeSpeed * game.clock.deltaTime);
+			newX = this.x + Math.min(requiredMovementX, game.centipedeSpeed * app.clock.deltaTime);
 			inactive = false;
 			rotation = 180;
 		} else if (this.x > finalX + 0.01) {
-			newX = this.x - Math.min(requiredMovementX, game.centipedeSpeed * game.clock.deltaTime);
+			newX = this.x - Math.min(requiredMovementX, game.centipedeSpeed * app.clock.deltaTime);
 			inactive = false;
 			rotation = 0;
 		} else {
 			newX = this.x;
 		}
 		if (this.y < finalY - 0.01) {
-			newY = this.y + Math.min(requiredMovementY, game.centipedeSpeed * game.clock.deltaTime);
+			newY = this.y + Math.min(requiredMovementY, game.centipedeSpeed * app.clock.deltaTime);
 			inactive = false;
 			rotation = -90;
 		} else if (this.y > finalY + 0.01) {
-			newY = this.y - Math.min(requiredMovementY, game.centipedeSpeed * game.clock.deltaTime);
+			newY = this.y - Math.min(requiredMovementY, game.centipedeSpeed * app.clock.deltaTime);
 			inactive = false;
 			rotation = 90;
 		} else {
@@ -334,7 +334,161 @@ class Centipede extends Entity {
 	}
 }
 
-class Game {
+class Scene {
+	constructor() {}
+	open() {}
+	close() {}
+	update() {}
+	draw() {}
+}
+
+class MainMenu extends Scene {
+	constructor() {
+		super();
+	}
+	open() {
+		document.getElementById('game-main-menu').style.display = 'block';
+		document.getElementById('game-play-button').onclick = function () {
+			window.app.openScene(new Game());
+		};
+	}
+	close() {
+		document.getElementById('game-main-menu').style.display = 'none';
+		document.getElementById('game-play-button').onclick = null;
+	}
+}
+
+class Game extends Scene {
+	constructor() {
+		super();
+	}
+	open() {
+		window.game = this;
+		document.getElementById('game-overlay').style.display = 'block';
+
+		this.entities = [];
+
+		this.score = 0;
+		this.centipedeSpeed = 0;
+		this.level = 0;
+		this.remainingParts = 0;
+		this.mushroomTimer = 0;
+
+		this.updateScore(0);
+		this.spawnPlayer();
+
+		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
+		this.map.spawnDefaultMushrooms();
+	}
+	close() {
+		document.getElementById('game-overlay').style.display = 'none';
+	}
+	update () {
+		for (let i = 0; i < this.entities.length; ++i) {
+			let entity = this.entities[i];
+			entity.update();
+			if (entity.markedForRemoval) {
+				this.entities.splice(i, 1);
+				--i;
+			}
+		}
+
+		if (this.isPlayerDead) {
+			this.mushroomTimer -= this.clock.deltaTime;
+			if (this.mushroomTimer <= 0) {
+				if (!this.map.restoreNextMushroom()) {
+					this.spawnPlayer();
+					this.startLevel();
+				} else {
+					this.mushroomTimer = 0.15;
+				}
+			}
+		} else if (this.remainingParts === 0 || app.input.wasKeyPressed(Yaje.Keys.L)) {
+			this.nextLevel();
+		} else {
+			if (this.wasBottomReached) {
+				this.spawnBottomHead();
+			}
+		}
+	}
+	draw() {
+		for (var entity of this.entities) {
+			entity.draw();
+		}
+	}
+	spawnPlayer() {
+		this.player = new Player();
+		this.isPlayerDead = false;
+		this.entities.push(this.player);
+		app.musicPlayer.play('default');
+	}
+	nextLevel() {
+		this.level += 1;
+		this.startLevel();
+	}
+	startLevel() {
+		this.wasBottomReached = false;
+		this.bottomHeadTimer = 2.5;
+		this.centipedeSpeed = CENTIPEDE_INITIAL_SPEED + CENTIPEDE_SPEED_PER_LEVEL * this.level;
+		let centipedePart = null;
+		for (let i = 0; i < this.level * 5; ++i) {
+			centipedePart = new Centipede(centipedePart, Math.floor(this.map.width / 2), -1 - i);
+			this.entities.push(centipedePart);
+		}
+		this.setColors();
+	}
+	killPlayer() {
+		this.isPlayerDead = true;
+		this.remainingParts = 0;
+		for (var i = 0; i < game.entities.length; ++i) {
+			if (game.entities[i].type === 'Centipede') {
+				game.entities[i].remove();
+			}
+		}
+		this.mushroomTimer = 1.5;
+		app.musicPlayer.stop();
+	}
+	spawnBottomHead() {
+		this.bottomHeadTimer -= this.clock.deltaTime;
+		if (this.bottomHeadTimer <= 0) {
+			let x = Math.random() < 0.5 ? -1 : this.map.width;
+			let y = Math.floor(Math.random() * (this.map.height - this.map.heightLimit)) + this.map.heightLimit;
+			let head = new Centipede(null, x, y);
+			if (x > 0) head.direction = -1;
+			this.setEntityColor(head);
+			this.entities.push(head);
+			this.bottomHeadTimer = 5.0;
+		}
+	}
+	setColors() {
+		let color = Game.colors[(this.level - 1) % Game.colors.length];
+		this.colorR = ((color >> 16) & 0xFF) / 0xFF;
+		this.colorG = ((color >> 8) & 0xFF) / 0xFF;
+		this.colorB = (color & 0xFF) / 0xFF;
+		for (let i = 0; i < this.entities.length; ++i) {
+			this.setEntityColor(this.entities[i]);
+		}
+	}
+	setEntityColor(entity) {
+		if (entity.type == 'Mushroom') {
+			entity.sprite.setColor(this.colorR, this.colorG, this.colorB, 1.0);
+		} else {
+			entity.sprite.setColor(1.0 - this.colorR, 1.0 - this.colorG, 1.0 - this.colorB, 1.0);
+		}
+	}
+	addEntity(entity) {
+		this.setEntityColor(entity);
+		this.entities.push(entity);
+	}
+	updateScore(delta) {
+		this.score += delta;
+		document.getElementById('game-score-value').innerHTML = this.score;
+	}
+}
+
+Game.colors = [0x20F020, 0x3040F0, 0xF02020];
+
+class App {
 	constructor() {
 		let canvas = document.getElementById('game-canvas');
 		this.graphics = new Yaje.Graphics();
@@ -367,139 +521,38 @@ class Game {
 		this.soundPlayer.register('little-pop', 'assets/pop2.wav', 3);
 		this.soundPlayer.register('explosion', 'assets/explosion.ogg');
 
-		this.entities = [];
-
-		this.score = 0;
-		this.centipedeSpeed = 0;
-		this.level = 0;
-		this.remainingParts = 0;
-		this.mushroomTimer = 0;
+		this.currentScene = null;
 	}
 	start() {
-		this.updateScore(0);
-
-		this.spawnPlayer();
-
-		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
-		this.map.spawnDefaultMushrooms();
+		this.openScene(new MainMenu());
 	}
 	update() {
 		requestAnimationFrame(() => this.update());
 		this.clock.update();
 		this.input.update();
 
-		for (let i = 0; i < this.entities.length; ++i) {
-			let entity = this.entities[i];
-			entity.update();
-			if (entity.markedForRemoval) {
-				this.entities.splice(i, 1);
-				--i;
-			}
-		}
-
-		if (this.isPlayerDead) {
-			this.mushroomTimer -= this.clock.deltaTime;
-			if (this.mushroomTimer <= 0) {
-				if (!this.map.restoreNextMushroom()) {
-					this.spawnPlayer();
-					this.startLevel();
-				} else {
-					this.mushroomTimer = 0.15;
-				}
-			}
-		} else if (this.remainingParts === 0 || this.input.wasKeyPressed(Yaje.Keys.L)) {
-			this.nextLevel();
-		} else {
-			if (this.wasBottomReached) {
-				this.spawnBottomHead();
-			}
-		}
+		this.currentScene.update();
 
 		this.draw();
 	}
-	spawnPlayer() {
-		this.player = new Player();
-		this.isPlayerDead = false;
-		this.entities.push(this.player);
-		this.musicPlayer.play('default');
-	}
-	nextLevel() {
-		this.level += 1;
-		this.startLevel();
-	}
-	startLevel() {
-		this.wasBottomReached = false;
-		this.bottomHeadTimer = 2.5;
-		this.centipedeSpeed = CENTIPEDE_INITIAL_SPEED + CENTIPEDE_SPEED_PER_LEVEL * this.level;
-		let centipedePart = null;
-		for (let i = 0; i < this.level * 5; ++i) {
-			centipedePart = new Centipede(centipedePart, Math.floor(this.map.width / 2), -1 - i);
-			this.entities.push(centipedePart);
-		}
-		this.setColors();
-	}
-	killPlayer() {
-		this.isPlayerDead = true;
-		this.remainingParts = 0;
-		for (var i = 0; i < game.entities.length; ++i) {
-			if (game.entities[i].type === 'Centipede') {
-				game.entities[i].remove();
-			}
-		}
-		this.mushroomTimer = 1.5;
-		this.musicPlayer.stop();
-	}
-	spawnBottomHead() {
-		this.bottomHeadTimer -= this.clock.deltaTime;
-		if (this.bottomHeadTimer <= 0) {
-			let x = Math.random() < 0.5 ? -1 : this.map.width;
-			let y = Math.floor(Math.random() * (this.map.height - this.map.heightLimit)) + this.map.heightLimit;
-			let head = new Centipede(null, x, y);
-			if (x > 0) head.direction = -1;
-			this.setEntityColor(head);
-			this.entities.push(head);
-			this.bottomHeadTimer = 5.0;
-		}
-	}
-	setColors() {
-		let color = Game.colors[(this.level - 1) % Game.colors.length];
-		this.colorR = ((color >> 16) & 0xFF) / 0xFF;
-		this.colorG = ((color >> 8) & 0xFF) / 0xFF;
-		this.colorB = (color & 0xFF) / 0xFF;
-		for (let i = 0; i < this.entities.length; ++i) {
-			this.setEntityColor(this.entities[i]);
-		}
-	}
-	setEntityColor(entity) {
-		if (entity.type == 'Mushroom') {
-			entity.sprite.setColor(this.colorR, this.colorG, this.colorB, 1.0);
-		} else {
-			entity.sprite.setColor(1.0 - this.colorR, 1.0 - this.colorG, 1.0 - this.colorB, 1.0);
-		}
-	}
 	draw() {
 		this.graphics.clear();
-
-		for (var entity of this.entities) {
-			entity.draw();
-		}
-
+		this.currentScene.draw();
 		this.graphics.display();
 	}
-	addEntity(entity) {
-		this.setEntityColor(entity);
-		this.entities.push(entity);
-	}
-	updateScore(delta) {
-		this.score += delta;
-		document.getElementById('game-score-value').innerHTML = this.score;
+	openScene(scene) {
+		if (this.currentScene !== null) {
+			this.currentScene.close();
+		}
+		this.currentScene = scene;
+		if (this.currentScene !== null) {
+			this.currentScene.open();
+		}
 	}
 }
 
-Game.colors = [0x20F020, 0x3040F0, 0xF02020];
-
 (function () {
-	window.game = new Game();
-	window.game.start();
-	window.game.update();
+	window.app = new App();
+	window.app.start();
+	window.app.update();
 })();
