@@ -104,7 +104,7 @@ class Map {
 				if (this.mushrooms[x][y] !== null && !this.mushrooms[x][y].markedForRemoval && this.mushrooms[x][y].health < 4) {
 					this.mushrooms[x][y].setHealth(4);
 					game.soundPlayer.play('little-pop');
-					game.updateScore(10);
+					game.updateScore(5);
 					return true;
 				}
 			}
@@ -330,7 +330,7 @@ class Centipede extends Entity {
 		game.map.spawnMushroom(this.mapX, this.mapY);
 		this.remove();
 		game.remainingParts -= 1;
-		game.updateScore(this.parent === null ? 20 : 10);
+		game.updateScore(this.parent === null ? 100 : 10);
 	}
 }
 
