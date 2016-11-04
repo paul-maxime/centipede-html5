@@ -5,7 +5,10 @@ const PLAYER_SPEED = 400.0;
 const MISSILE_SPEED = 1200.0;
 
 const CENTIPEDE_INITIAL_SPEED = 100;
-const CENTIPEDE_SPEED_PER_LEVEL = 25;
+const CENTIPEDE_SPEED_PER_LEVEL = 20;
+
+const CENTIPEDE_INITIAL_PARTS = 2;
+const CENTIPEDE_PARTS_PER_LEVEL = 3;
 
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 640;
@@ -394,7 +397,7 @@ class Game extends Scene {
 		}
 
 		if (this.isPlayerDead) {
-			this.mushroomTimer -= this.clock.deltaTime;
+			this.mushroomTimer -= app.clock.deltaTime;
 			if (this.mushroomTimer <= 0) {
 				if (!this.map.restoreNextMushroom()) {
 					this.spawnPlayer();
@@ -431,7 +434,7 @@ class Game extends Scene {
 		this.bottomHeadTimer = 2.5;
 		this.centipedeSpeed = CENTIPEDE_INITIAL_SPEED + CENTIPEDE_SPEED_PER_LEVEL * this.level;
 		let centipedePart = null;
-		for (let i = 0; i < this.level * 5; ++i) {
+		for (let i = 0; i < CENTIPEDE_INITIAL_PARTS + this.level * CENTIPEDE_PARTS_PER_LEVEL; ++i) {
 			centipedePart = new Centipede(centipedePart, Math.floor(this.map.width / 2), -1 - i);
 			this.entities.push(centipedePart);
 		}
