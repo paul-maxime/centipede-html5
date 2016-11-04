@@ -149,7 +149,7 @@ class Player extends Entity {
 		vec2.normalize(this.playerMovement, this.playerMovement);
 		this.playerMovement[0] *= PLAYER_SPEED * game.clock.deltaTime;
 		this.playerMovement[1] *= PLAYER_SPEED * game.clock.deltaTime;
-		
+
 		this.sprite.move(this.playerMovement[0], 0);
 		if (this.isCollidingWithMushroom()) {
 			this.sprite.move(-this.playerMovement[0], 0);
@@ -365,7 +365,7 @@ class Game {
 		this.soundPlayer.register('explosion', 'assets/explosion.ogg');
 
 		this.entities = [];
-		
+
 		this.score = 0;
 		this.centipedeSpeed = 0;
 		this.level = 0;
@@ -374,9 +374,9 @@ class Game {
 	}
 	start() {
 		this.updateScore(0);
-		
+
 		this.spawnPlayer();
-		
+
 		this.map = new Map(Math.floor(GAME_WIDTH / 32), Math.floor(GAME_HEIGHT / 32));
 		this.map.spawnDefaultMushrooms();
 	}
@@ -399,7 +399,7 @@ class Game {
 			if (this.mushroomTimer <= 0) {
 				if (!this.map.restoreNextMushroom()) {
 					this.spawnPlayer();
-					this.nextLevel();
+					this.startLevel();
 				} else {
 					this.mushroomTimer = 0.15;
 				}
@@ -418,6 +418,10 @@ class Game {
 	}
 	nextLevel() {
 		this.level += 1;
+		this.startLevel();
+	}
+	startLevel() {
+		this.wasBottomReached = false;
 		this.centipedeSpeed = CENTIPEDE_INITIAL_SPEED + CENTIPEDE_SPEED_PER_LEVEL * this.level;
 		let centipedePart = null;
 		for (let i = 0; i < this.level * 5; ++i) {
