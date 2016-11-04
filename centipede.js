@@ -348,16 +348,30 @@ class Scene {
 class MainMenu extends Scene {
 	constructor() {
 		super();
+		this.blinkingTimer = 0;
 	}
 	open() {
 		document.getElementById('game-main-menu').style.display = 'block';
-		document.getElementById('game-play-button').onclick = function () {
-			window.app.openScene(new Game());
-		};
 	}
 	close() {
 		document.getElementById('game-main-menu').style.display = 'none';
-		document.getElementById('game-play-button').onclick = null;
+	}
+	update() {
+		this.checkForInput();
+		this.updateBlinking();
+	}
+	checkForInput() {
+		if (app.input.wasKeyPressed(Yaje.Keys.SPACE)) {
+			app.openScene(new Game());
+		}
+	}
+	updateBlinking() {
+		this.blinkingTimer += Math.floor(app.clock.deltaTime * 1000);
+		if (this.blinkingTimer % 1000 < 500) {
+			document.getElementById('game-press-key').style.display = 'inline';
+		} else {
+			document.getElementById('game-press-key').style.display = 'none';
+		}
 	}
 }
 
