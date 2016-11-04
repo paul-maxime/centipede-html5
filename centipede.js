@@ -297,7 +297,7 @@ class Centipede extends Entity {
 		}
 		let nextDirection = this.direction;
 		let nextVerticalDirection = this.verticalDirection;
-		if (!game.map.isCellAccessible(x, y)) {
+		if (!game.map.isCellAccessible(x, y) && this.mapX >= 0 && this.mapX < game.map.width) {
 			if ((this.verticalDirection === 1 && y >= game.map.height - 1) ||
 				(this.verticalDirection === -1 && y <= game.map.heightLimit)) {
 				nextVerticalDirection = this.verticalDirection * -1;
@@ -311,6 +311,9 @@ class Centipede extends Entity {
 			this.mapY = y;
 			this.direction = nextDirection;
 			this.verticalDirection = nextVerticalDirection;
+		}
+		if (this.mapY >= game.map.height - 1) {
+			game.wasBottomReached = true;
 		}
 	}
 	isAnotherCentipedeOnCell(x, y) {
@@ -406,6 +409,10 @@ class Game {
 			}
 		} else if (this.remainingParts === 0 || this.input.wasKeyPressed(Yaje.Keys.L)) {
 			this.nextLevel();
+		} else {
+			if (this.wasBottomReached) {
+				this.spawnBottomHead();
+			}
 		}
 
 		this.draw();
@@ -422,6 +429,7 @@ class Game {
 	}
 	startLevel() {
 		this.wasBottomReached = false;
+		this.bottomHeadTimer = 2.5;
 		this.centipedeSpeed = CENTIPEDE_INITIAL_SPEED + CENTIPEDE_SPEED_PER_LEVEL * this.level;
 		let centipedePart = null;
 		for (let i = 0; i < this.level * 5; ++i) {
@@ -440,6 +448,18 @@ class Game {
 		}
 		this.mushroomTimer = 1.5;
 		this.musicPlayer.stop();
+	}
+	spawnBottomHead() {
+		this.bottomHeadTimer -= this.clock.deltaTime;
+		if (this.bottomHeadTimer <= 0) {
+			let x = Math.random() < 0.5 ? -1 : this.map.width;
+			let y = Math.floor(Math.random() * (this.map.height - this.map.heightLimit)) + this.map.heightLimit;
+			let head = new Centipede(null, x, y);
+			if (x > 0) head.direction = -1;
+			this.setEntityColor(head);
+			this.entities.push(head);
+			this.bottomHeadTimer = 5.0;
+		}
 	}
 	setColors() {
 		let color = Game.colors[(this.level - 1) % Game.colors.length];
