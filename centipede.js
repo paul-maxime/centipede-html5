@@ -361,7 +361,7 @@ class MainMenu extends Scene {
 		this.updateBlinking();
 	}
 	checkForInput() {
-		if (app.input.wasKeyPressed(Yaje.Keys.SPACE)) {
+		if (app.input.wasKeyReleased(Yaje.Keys.SPACE)) {
 			app.openScene(new Game());
 		}
 	}
@@ -420,7 +420,7 @@ class Game extends Scene {
 					this.mushroomTimer = 0.15;
 				}
 			}
-		} else if (this.remainingParts === 0 || app.input.wasKeyPressed(Yaje.Keys.L)) {
+		} else if (this.remainingParts === 0 || app.input.wasKeyReleased(Yaje.Keys.L)) {
 			this.nextLevel();
 		} else {
 			if (this.wasBottomReached) {
