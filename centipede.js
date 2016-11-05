@@ -484,7 +484,7 @@ class Game extends Scene {
 		app.musicPlayer.stop();
 	}
 	spawnBottomHead() {
-		this.bottomHeadTimer -= this.clock.deltaTime;
+		this.bottomHeadTimer -= app.clock.deltaTime;
 		if (this.bottomHeadTimer <= 0) {
 			let x = Math.random() < 0.5 ? -1 : this.map.width;
 			let y = Math.floor(Math.random() * (this.map.height - this.map.heightLimit)) + this.map.heightLimit;
