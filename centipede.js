@@ -96,8 +96,8 @@ class Map {
 	spawnDefaultMushrooms() {
 		let number = Math.floor(Math.random() * 10) + 20;
 		for (let i = 0; i < number; ++i) {
-			var x = Math.floor(Math.random() * this.width);
-			var y = Math.floor(Math.random() * (this.height - 1));
+			var x = Math.floor(Math.random() * (this.width));
+			var y = Math.floor(Math.random() * (this.height - 2) + 1);
 			this.spawnMushroom(x, y);
 		}
 	}
@@ -294,7 +294,7 @@ class Centipede extends Entity {
 	moveToNextCell() {
 		let x = this.mapX + this.direction;
 		let y = this.mapY;
-		if (this.mapY < 0) {
+		if (this.mapY < 1) {
 			this.mapY = y + 1;
 			return;
 		}
@@ -444,9 +444,9 @@ class Game extends Scene {
 		this.drawLives();
 	}
 	drawLives() {
-		let y = 4;
+		let y = 2;
 		for (let i = 0; i < this.lives; ++i) {
-			let x = GAME_WIDTH - (this.lifeSprite.height + 2) * (i + 1) - 2;
+			let x = GAME_WIDTH - 2 - (this.lifeSprite.height) * (i + 1);
 			this.lifeSprite.setPosition(x, y);
 			app.graphics.draw(this.lifeSprite);
 		}
