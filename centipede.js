@@ -391,6 +391,9 @@ class Game extends Scene {
 		this.remainingParts = 0;
 		this.mushroomTimer = 0;
 
+		this.lives = 3;
+		this.lifeSprite = app.spritesheet.createSprite('player');
+
 		this.updateScore(0);
 		this.spawnPlayer();
 
@@ -431,6 +434,15 @@ class Game extends Scene {
 	draw() {
 		for (var entity of this.entities) {
 			entity.draw();
+		}
+		this.drawLives();
+	}
+	drawLives() {
+		let y = 4;
+		for (let i = 0; i < this.lives; ++i) {
+			let x = GAME_WIDTH - (this.lifeSprite.height + 2) * (i + 1) - 2;
+			this.lifeSprite.setPosition(x, y);
+			app.graphics.draw(this.lifeSprite);
 		}
 	}
 	spawnPlayer() {
