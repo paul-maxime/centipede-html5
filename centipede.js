@@ -401,6 +401,7 @@ class Game extends Scene {
 		this.map.spawnDefaultMushrooms();
 	}
 	close() {
+		window.game = null;
 		document.getElementById('game-overlay').style.display = 'none';
 	}
 	update () {
@@ -417,8 +418,13 @@ class Game extends Scene {
 			this.mushroomTimer -= app.clock.deltaTime;
 			if (this.mushroomTimer <= 0) {
 				if (!this.map.restoreNextMushroom()) {
-					this.spawnPlayer();
-					this.startLevel();
+					this.lives -= 1;
+					if (this.lives >= 0) {
+						this.spawnPlayer();
+						this.startLevel();
+					} else {
+						app.openScene(new MainMenu());
+					}
 				} else {
 					this.mushroomTimer = 0.15;
 				}
