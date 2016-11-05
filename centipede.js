@@ -405,6 +405,11 @@ class Game extends Scene {
 		document.getElementById('game-overlay').style.display = 'none';
 	}
 	update () {
+		if (app.input.wasKeyReleased(Yaje.Keys.ESCAPE)) {
+			app.openScene(new MainMenu());
+			return;
+		}
+
 		for (let i = 0; i < this.entities.length; ++i) {
 			let entity = this.entities[i];
 			entity.update();
