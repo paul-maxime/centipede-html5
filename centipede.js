@@ -428,6 +428,11 @@ class Game extends Scene {
 						this.spawnPlayer();
 						this.startLevel();
 					} else {
+						// TODO Game over scene
+						if (this.score > app.storage.maxScore) {
+							app.storage.maxScore = this.score;
+							app.storage.save();
+						}
 						app.openScene(new MainMenu());
 					}
 				} else {
@@ -560,6 +565,11 @@ class App {
 		this.soundPlayer.register('big-pop', 'assets/pop1.wav', 3);
 		this.soundPlayer.register('little-pop', 'assets/pop2.wav', 3);
 		this.soundPlayer.register('explosion', 'assets/explosion.ogg');
+		
+		this.storage = new Yaje.Storage('centipede');
+		if (!this.storage.maxScore) {
+			this.storage.maxScore = 0;
+		}
 
 		this.currentScene = null;
 	}
